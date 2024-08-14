@@ -4,38 +4,30 @@ on:
   workflow_dispatch: # 수동 실행
   workflow_run: # 특정 workflow가 실행됐을 때
     workflows: ['talentVerse CI'] # CI workflow
-    types: [completed] # 완료 되었을 때
+    types: [completed] # 완료되었을 때
     branches: [main] # main 브랜치
-
-env:
-  PROJECT_DIR: /home/ubuntu/back-end # ubuntu에 접속해서 clone 받은 파일 경로..?
 
 jobs:
   deploy:
     # workflow 완료 후 결과가 성공 일 때
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    # 작업을 실행 할 VM의 OS 지정
     runs-on: ubuntu-24.04
     timeout-minutes: 3 # 3분 이상 걸리면 실패
 
-    # 작업 내의 단위 작업 정의
     steps:
-      #소스 코드 가져오기
       - name: Checkout source code # 소스 코드를 체크아웃하는 단계
         uses: actions/checkout@v4 # GitHub 리포지토리의 소스 코드를 가져오기 위해 actions/checkout 액션 사용
 
-      - name: Set environment variables  # 환경 변수를 설정하는 단계
-        run: echo "${{ secrets.ENV }}" > .env  # GitHub Secrets에 저장된 ENV 값을 .env 파일로 생성
+      - name: Set environment variables # 환경 변수를 설정하는 단계
+        run: echo "${{ secrets.ENV }}" > .env # GitHub Secrets에 저장된 ENV 값을 .env 파일로 생성
 
-      - name: Configure AWS credentials  # AWS 자격 증명을 설정하는 단계
-        uses: aws-actions/configure-aws-credentials@v2  # AWS CLI를 사용하기 위해 자격 증명 설정
+      - name: Configure AWS credentials # AWS 자격 증명을 설정하는 단계
+        uses: aws-actions/configure-aws-credentials@v2 # AWS CLI를 사용하기 위해 자격 증명 설정
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS Access Key ID를 GitHub Secrets에서 가져옴
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS Secret Access Key를 GitHub Secrets에서 가져옴
-          aws-region: ${{ secrets.AWS_REGION }}  # AWS 리전을 GitHub Secrets에서 가져와 설정
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} # AWS Access Key ID를 GitHub Secrets에서 가져옴
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # AWS Secret Access Key를 GitHub Secrets에서 가져옴
+          aws-region: ${{ secrets.AWS_REGION }} # AWS 리전을 GitHub Secrets에서 가져와 설정
 
-      - name: Deploy to ECS  # ECS에 배포하는 단계
+      - name: Deploy to ECS # ECS에 배포하는 단계
         run: |
           aws ecs update-service --cluster ${{ secrets.ECS_CLUSTER_NAME }} --service ${{ secrets.ECS_SERVICE_NAME }} --force-new-deployment --region ${{ secrets.AWS_REGION }}  # ECS 서비스를 업데이트하여 새 이미지를 배포
-
-    

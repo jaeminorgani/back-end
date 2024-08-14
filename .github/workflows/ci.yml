@@ -1,14 +1,11 @@
 name: talentVerse CI
 
-on: # 언제 실행 될지 정의
+on: # 언제 실행될지 정의
   workflow_dispatch: # 수동 실행
   push: # PUSH 됐을 때
     branches: [main] # main 브랜치
   pull_request: # PR
-    # opened: 새롭게 생성됐을 때
-    # reopened: close 상태에서 다시 open으로 변경 됐을 때
-    # synchronize: open 상태에서 추가 commit 등으로 갱신 됐을 때
-    types: [opened, reopened, synchronize] # (생략가능) types를 명시하지 않았을 때 적용되는 3가지 이벤트
+    types: [opened, reopened, synchronize] # PR 이벤트에 반응
     branches: [main] # main 브랜치
 
 env: # 워크플로우에서 사용할 환경 변수 설정
@@ -23,6 +20,9 @@ jobs:
     steps: # 작업 내에서 실행될 단계(step)들을 정의
       - name: Checkout source code # 소스 코드를 체크아웃하는 단계
         uses: actions/checkout@v4 # GitHub 리포지토리의 소스 코드를 가져오기 위해 actions/checkout 액션 사용
+
+      - name: Set environment variables  # 환경 변수를 설정하는 단계
+        run: echo "${{ secrets.ENV }}" > .env  # GitHub Secrets에 저장된 ENV 값을 .env 파일로 생성
 
       - name: Set up Docker Buildx # Docker Buildx를 설정하는 단계
         uses: docker/setup-buildx-action@v2 # Docker의 Buildx 기능을 사용하여 빌드 환경을 설정
