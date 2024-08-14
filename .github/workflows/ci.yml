@@ -30,7 +30,7 @@ jobs:
       - name: Log in to Amazon ECR # Amazon ECR에 로그인하는 단계
         uses: aws-actions/amazon-ecr-login@v1 # ECR에 로그인하기 위해 aws-actions/amazon-ecr-login 액션 사용
         with:
-          registry-type: ecr # ECR로 레지스트리 유형 설정
+          registry-type: private # ECR로 레지스트리 유형 설정
 
       - name: Configure AWS credentials # AWS 자격 증명을 설정하는 단계
         uses: aws-actions/configure-aws-credentials@v2 # AWS CLI를 사용하기 위해 자격 증명 설정
