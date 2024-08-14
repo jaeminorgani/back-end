@@ -26,19 +26,18 @@ jobs:
 
       - name: Set up Docker Buildx # Docker Buildx를 설정하는 단계
         uses: docker/setup-buildx-action@v2 # Docker의 Buildx 기능을 사용하여 빌드 환경을 설정
-
-      - name: Log in to Amazon ECR # Amazon ECR에 로그인하는 단계
-        uses: aws-actions/amazon-ecr-login@v1 # ECR에 로그인하기 위해 aws-actions/amazon-ecr-login 액션 사용
-        with:
-          registry-type: private # ECR로 레지스트리 유형 설정
-
+        
       - name: Configure AWS credentials # AWS 자격 증명을 설정하는 단계
         uses: aws-actions/configure-aws-credentials@v2 # AWS CLI를 사용하기 위해 자격 증명 설정
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} # AWS Access Key ID를 GitHub Secrets에서 가져옴
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # AWS Secret Access Key를 GitHub Secrets에서 가져옴
           aws-region: ${{ secrets.AWS_REGION }} # AWS 리전을 GitHub Secrets에서 가져와 설정
-
+      
+      - name: Log in to Amazon ECR  # Amazon ECR에 로그인하는 단계
+        run: aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+        # AWS CLI를 사용하여 ECR에 로그인하고 Docker 자격 증명을 설정합니다.
+  
       - name: Build and Push Docker image to ECR # Docker 이미지를 빌드하고 ECR에 푸시하는 단계
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .  # Docker 이미지를 빌드하고 태그 설정
